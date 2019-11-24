@@ -28,15 +28,15 @@ class APIHelper
                 raise "Specified merchant setting name (#{active_merc_info}) not found."
             end
         else
-            active_merc_info = config[:merc_profile]
-            @op_mode = config[:operating_mode]
-            @contractor_stat = config[:is_project_contractor]
-            merc_info = config[:merchant_info][active_merc_info]
-            @ignore_payment = config[:ignore_payment]
+            active_merc_info = config['merc_profile']
+            @op_mode = config['operating_mode']
+            @contractor_stat = config['is_project_contractor']
+            merc_info = config['merchant_info'][active_merc_info]
+            @ignore_payment = config['ignore_payment']
             if merc_info != []
-                @merc_id = merc_info[:merchant_id].freeze
-                @hkey = merc_info[:hash_key].freeze
-                @hiv = merc_info[:hash_iv].freeze
+                @merc_id = merc_info['merchant_id'].freeze
+                @hkey = merc_info['hash_key'].freeze
+                @hiv = merc_info['hash_iv'].freeze
             else
                 raise "Specified merchant setting name (#{active_merc_info}) not found."
             end
