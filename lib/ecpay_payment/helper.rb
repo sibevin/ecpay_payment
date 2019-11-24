@@ -11,20 +11,35 @@ class APIHelper
     conf = File.join(File.dirname(__FILE__), '..', '..', 'conf', 'payment_conf.xml')
     @@conf_xml = Nokogiri::XML(File.open(conf))
 
-    def initialize
-        active_merc_info = @@conf_xml.xpath('/Conf/MercProfile').text
-        @op_mode = @@conf_xml.xpath('/Conf/OperatingMode').text
-        @contractor_stat = @@conf_xml.xpath('/Conf/IsProjectContractor').text
-        merc_info = @@conf_xml.xpath("/Conf/MerchantInfo/MInfo[@name=\"#{active_merc_info}\"]")
-        @ignore_payment = []
-        @@conf_xml.xpath('/Conf/IgnorePayment//Method').each {|t| @ignore_payment.push(t.text)}
-        if merc_info != []
-            @merc_id = merc_info[0].xpath('./MerchantID').text.freeze
-            @hkey = merc_info[0].xpath('./HashKey').text.freeze
-            @hiv = merc_info[0].xpath('./HashIV').text.freeze
+    def initialize(config = nil)
+        if config.nil?
+            active_merc_info = @@conf_xml.xpath('/Conf/MercProfile').text
+            @op_mode = @@conf_xml.xpath('/Conf/OperatingMode').text
+            @contractor_stat = @@conf_xml.xpath('/Conf/IsProjectContractor').text
+            merc_info = @@conf_xml.xpath("/Conf/MerchantInfo/MInfo[@name=\"#{active_merc_info}\"]")
+            @ignore_payment = []
+            @@conf_xml.xpath('/Conf/IgnorePayment//Method').each {|t| @ignore_payment.push(t.text)}
+            if merc_info != []
+                @merc_id = merc_info[0].xpath('./MerchantID').text.freeze
+                @hkey = merc_info[0].xpath('./HashKey').text.freeze
+                @hiv = merc_info[0].xpath('./HashIV').text.freeze
 
+            else
+                raise "Specified merchant setting name (#{active_merc_info}) not found."
+            end
         else
-            raise "Specified merchant setting name (#{active_merc_info}) not found."
+            active_merc_info = config[:merc_profile]
+            @op_mode = config[:operating_mode]
+            @contractor_stat = config[:is_project_contractor]
+            merc_info = config[:merchant_info][active_merc_info]
+            @ignore_payment = config[:ignore_payment]
+            if merc_info != []
+                @merc_id = merc_info[:merchant_id].freeze
+                @hkey = merc_info[:hash_key].freeze
+                @hiv = merc_info[:hash_iv].freeze
+            else
+                raise "Specified merchant setting name (#{active_merc_info}) not found."
+            end
         end
     end
 
